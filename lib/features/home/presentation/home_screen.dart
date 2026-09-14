@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_theme.dart';
+import '../../products/presentation/products_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback? onNormalOrder;
@@ -16,97 +17,258 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              // App Logo / Header
+              // Top Location & Profile Header
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.fastfood_rounded,
-                      color: AppColors.primary,
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const SizedBox(height: 2),
+                      const Text(
                         'Collab Food',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
                           color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        'Order together, live and synchronized',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: AppColors.primary,
+                        size: 24,
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-              const SizedBox(height: 36),
-
-              const Text(
-                'How would you like to order today?',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
               ),
               const SizedBox(height: 20),
 
-              // Normal Order Card
-              _OrderOptionCard(
-                icon: Icons.person_outline_rounded,
-                title: 'Normal (Solo) Order',
-                subtitle: 'Standard solo shopping cart experience with instant checkout.',
-                badgeText: 'SOLO',
-                badgeColor: Colors.blue.shade100,
-                badgeTextColor: Colors.blue.shade800,
-                onTap: onNormalOrder ?? () {},
+              // Hero Promotional Banner with Warm Sunset Gradient
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFF5722),
+                      Color(0xFFFF8A65),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF5722).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt_rounded, size: 14, color: Colors.white),
+                          SizedBox(width: 4),
+                          Text(
+                            'LIVE COLLABORATION',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Hungry together?\nOrder in seconds.',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        height: 1.15,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Order solo or team up in a live session with friends.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Section Heading
+              const Text(
+                'Choose Your Experience',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  letterSpacing: -0.3,
+                ),
               ),
               const SizedBox(height: 16),
 
-              // Start Group Order Card
-              _OrderOptionCard(
-                icon: Icons.group_add_outlined,
+              // Featured Card: Start Group Order
+              _HeroActionCard(
+                icon: Icons.groups_rounded,
+                iconColor: const Color(0xFFFF6F00),
+                iconBg: const Color(0xFFFFF3E0),
                 title: 'Start Group Order',
-                subtitle: 'Host a session, get a unique 6-letter Join Code, and order with friends.',
-                badgeText: 'HOST',
-                badgeColor: Colors.orange.shade100,
-                badgeTextColor: Colors.orange.shade900,
+                subtitle: 'Host a session, get a unique 6-digit Join Code, and order with friends.',
+                badge: 'HOST',
+                badgeBg: const Color(0xFFFFE0B2),
+                badgeFg: const Color(0xFFE65100),
+                buttonText: 'Create Session',
                 onTap: onStartGroup ?? () {},
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // Join Group Order Card
-              _OrderOptionCard(
-                icon: Icons.login_rounded,
-                title: 'Join Group Session',
-                subtitle: 'Have a Join Code? Hop in and add your favorites to the group cart.',
-                badgeText: 'JOIN',
-                badgeColor: Colors.green.shade100,
-                badgeTextColor: Colors.green.shade900,
-                onTap: onJoinGroup ?? () {},
+              // Split Row: Solo Order & Join Session
+              Row(
+                children: [
+                  // Solo Order Card
+                  Expanded(
+                    child: _CompactOptionCard(
+                      icon: Icons.person_rounded,
+                      iconColor: const Color(0xFF1976D2),
+                      iconBg: const Color(0xFFE3F2FD),
+                      title: 'Order',
+                      subtitle: 'Just for you',
+                      onTap: onNormalOrder ??
+                          () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                            );
+                          },
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Join Group Card
+                  Expanded(
+                    child: _CompactOptionCard(
+                      icon: Icons.login_rounded,
+                      iconColor: const Color(0xFF388E3C),
+                      iconBg: const Color(0xFFE8F5E9),
+                      title: 'Join Group Session',
+                      subtitle: 'Enter code',
+                      onTap: onJoinGroup ?? () {},
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 28),
+
+              // Trending Treats Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Featured Menu Preview',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                      );
+                    },
+                    child: const Text('View All →', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Horizontal Food Teasers
+              SizedBox(
+                height: 140,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _FoodTeaserCard(
+                      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400',
+                      title: 'Classic Smash Burger',
+                      price: '\$9.99',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                        );
+                      },
+                    ),
+                    _FoodTeaserCard(
+                      imageUrl: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=400',
+                      title: 'Loaded Truffle Fries',
+                      price: '\$6.49',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                        );
+                      },
+                    ),
+                    _FoodTeaserCard(
+                      imageUrl: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400',
+                      title: 'Hot Honey Pizza',
+                      price: '\$16.49',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ProductsScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -115,22 +277,28 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _OrderOptionCard extends StatelessWidget {
+class _HeroActionCard extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
   final String title;
   final String subtitle;
-  final String badgeText;
-  final Color badgeColor;
-  final Color badgeTextColor;
+  final String badge;
+  final Color badgeBg;
+  final Color badgeFg;
+  final String buttonText;
   final VoidCallback onTap;
 
-  const _OrderOptionCard({
+  const _HeroActionCard({
     required this.icon,
+    required this.iconColor,
+    required this.iconBg,
     required this.title,
     required this.subtitle,
-    required this.badgeText,
-    required this.badgeColor,
-    required this.badgeTextColor,
+    required this.badge,
+    required this.badgeBg,
+    required this.badgeFg,
+    required this.buttonText,
     required this.onTap,
   });
 
@@ -138,13 +306,24 @@ class _OrderOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 1,
+      borderRadius: BorderRadius.circular(20),
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -153,45 +332,75 @@ class _OrderOptionCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.08),
+                      color: iconBg,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(icon, color: AppColors.primary, size: 24),
+                    child: Icon(icon, color: iconColor, size: 24),
                   ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: badgeColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      badgeText,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: badgeTextColor,
-                      ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: badgeBg,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                badge,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: badgeFg,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
+                child: Center(
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -202,48 +411,148 @@ class _OrderOptionCard extends StatelessWidget {
   }
 }
 
-class _FeatureRow extends StatelessWidget {
+class _CompactOptionCard extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
   final String title;
-  final String desc;
+  final String subtitle;
+  final VoidCallback onTap;
 
-  const _FeatureRow({
+  const _CompactOptionCard({
     required this.icon,
+    required this.iconColor,
+    required this.iconBg,
     required this.title,
-    required this.desc,
+    required this.subtitle,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: AppColors.primary),
-        const SizedBox(width: 12),
-        Expanded(
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(height: 12),
               Text(
                 title,
                 style: const TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
-                desc,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
+                subtitle,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade500,
                 ),
               ),
             ],
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _FoodTeaserCard extends StatelessWidget {
+  final String imageUrl;
+  final String title;
+  final String price;
+  final VoidCallback onTap;
+
+  const _FoodTeaserCard({
+    required this.imageUrl,
+    required this.title,
+    required this.price,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 140,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Image.network(
+                imageUrl,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey.shade200,
+                  child: const Center(child: Icon(Icons.fastfood, color: Colors.grey)),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    price,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
