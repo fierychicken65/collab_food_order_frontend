@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_theme.dart';
 import '../../products/presentation/products_screen.dart';
+import '../../group_order/presentation/dialogs/create_group_dialog.dart';
+import '../../group_order/presentation/dialogs/join_group_dialog.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback? onNormalOrder;
@@ -165,7 +167,13 @@ class HomeScreen extends StatelessWidget {
                 badgeBg: const Color(0xFFFFE0B2),
                 badgeFg: const Color(0xFFE65100),
                 buttonText: 'Create Session',
-                onTap: onStartGroup ?? () {},
+                onTap: onStartGroup ??
+                    () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const CreateGroupDialog(),
+                      );
+                    },
               ),
               const SizedBox(height: 14),
 
@@ -178,7 +186,7 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.person_rounded,
                       iconColor: const Color(0xFF1976D2),
                       iconBg: const Color(0xFFE3F2FD),
-                      title: 'Order',
+                      title: 'Normal (Solo) Order',
                       subtitle: 'Just for you',
                       onTap: onNormalOrder ??
                           () {
@@ -198,7 +206,13 @@ class HomeScreen extends StatelessWidget {
                       iconBg: const Color(0xFFE8F5E9),
                       title: 'Join Group Session',
                       subtitle: 'Enter code',
-                      onTap: onJoinGroup ?? () {},
+                      onTap: onJoinGroup ??
+                          () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => const JoinGroupDialog(),
+                            );
+                          },
                     ),
                   ),
                 ],
