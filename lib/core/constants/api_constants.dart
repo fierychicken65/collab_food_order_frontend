@@ -7,7 +7,7 @@ class ApiConstants {
   /// Can be set directly here or passed at build time via:
   /// `flutter build apk --dart-define=BACKEND_URL=https://...`
   static const String _envUrl = String.fromEnvironment('BACKEND_URL');
-  static const String? overrideBaseUrl = null;
+  static const String overrideBaseUrl = 'https://collab-food-order-backend.onrender.com';
 
   /// Returns base HTTP URL:
   /// - Priority 1: `--dart-define=BACKEND_URL=...` (if passed at build time)
@@ -18,8 +18,8 @@ class ApiConstants {
     if (_envUrl.isNotEmpty) {
       return _envUrl;
     }
-    if (overrideBaseUrl != null && overrideBaseUrl!.isNotEmpty) {
-      return overrideBaseUrl!;
+    if (overrideBaseUrl.isNotEmpty) {
+      return overrideBaseUrl;
     }
     if (kIsWeb) {
       return 'http://localhost:$defaultPort';
