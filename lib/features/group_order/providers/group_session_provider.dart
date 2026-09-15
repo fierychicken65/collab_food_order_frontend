@@ -239,6 +239,14 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
     state = null;
   }
 
+  void retryConnection() {
+    _wsClient.reconnect();
+  }
+
+  void requestSync() {
+    _wsClient.requestSync();
+  }
+
   @override
   void dispose() {
     _wsSubscription?.cancel();

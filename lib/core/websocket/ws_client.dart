@@ -140,6 +140,26 @@ class WsClient {
     _channel = null;
   }
 
+  void reconnect() {
+    if (_lastSessionId != null && _lastParticipantId != null) {
+      _reconnectTimer?.cancel();
+      _cleanup();
+      connect(
+        sessionId: _lastSessionId!,
+        participantId: _lastParticipantId!,
+      );
+    }
+  }
+
+  void requestSync() {
+    if (_lastSessionId != null) {
+      send({
+        'type': 'REQUEST_SYNC',
+        'sessionId': _lastSessionId,
+      });
+    }
+  }
+
   void disconnect() {
     _isDisposed = true;
     _reconnectTimer?.cancel();

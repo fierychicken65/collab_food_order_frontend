@@ -303,8 +303,87 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
               ],
             ),
           ),
-          body: TabBarView(
+          body: Column(
             children: [
+              // Offline / Reconnection Banner
+              StreamBuilder<WsConnectionStatus>(
+                stream: wsClient.statusStream,
+                initialData: wsClient.currentStatus,
+                builder: (context, snapshot) {
+                  final status =
+                      snapshot.data ?? WsConnectionStatus.disconnected;
+                  if (status == WsConnectionStatus.connected) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final isConnecting =
+                      status == WsConnectionStatus.connecting;
+
+                  return Container(
+                    width: double.infinity,
+                    color: isConnecting
+                        ? Colors.amber.shade800
+                        : Colors.red.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isConnecting
+                              ? Icons.sync_rounded
+                              : Icons.cloud_off_rounded,
+                          size: 16,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            isConnecting
+                                ? 'Reconnecting & synchronizing shared session...'
+                                : 'Connection lost. Live updates paused.',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (!isConnecting)
+                          TextButton(
+                            key: const ValueKey('retry_connection_button'),
+                            onPressed: () {
+                              ref
+                                  .read(groupSessionProvider.notifier)
+                                  .retryConnection();
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                            ),
+                            child: const Text(
+                              'RETRY NOW',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              // Main Tab Content
+              Expanded(
+                child: TabBarView(
+                  children: [
               // TAB 1: Real-time Menu Catalog
               Column(
                 children: [
@@ -556,7 +635,10 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
             ],
           ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+),
+);
   }
 }
