@@ -1,10 +1,10 @@
-# Collaborative Food Ordering App (Flutter Frontend) 📱🍕
+# Collaborative Food Ordering App (Flutter Frontend)
 
-A modern, responsive, real-time collaborative food delivery application built with **Flutter** and **Riverpod**. The app supports both solo dining orders and real-time multi-device group sessions with live cart synchronization, explicit item attribution, stock status protection, participant readiness toggling, and host-controlled checkout.
+A modern, responsive, real-time collaborative food delivery application built with Flutter and Riverpod for Android. The app supports both solo dining orders and real-time multi-device group sessions with live cart synchronization, explicit item attribution, stock status protection, participant readiness toggling, and host-controlled checkout.
 
 ---
 
-## ✨ Features & User Flows
+## Features & User Flows
 
 ### 1. Modern Food Ordering Experience
 - **Solo Order Flow**:
@@ -48,7 +48,7 @@ A modern, responsive, real-time collaborative food delivery application built wi
 
 ---
 
-## 🏗️ Architecture & Project Structure
+## Architecture & Project Structure
 
 ```
 lib/
@@ -84,19 +84,18 @@ lib/
 
 ---
 
-## ⚙️ Environment & Network Configuration
+## Environment & Network Configuration
 
 Network endpoints are configured in [`lib/core/constants/api_constants.dart`](lib/core/constants/api_constants.dart).
 
-The app automatically detects the host environment:
+The app automatically configures the connection for Android environments:
 | Environment | Base HTTP URL | WebSocket URL |
 | :--- | :--- | :--- |
-| **Web / Desktop** | `http://localhost:3000` | `ws://localhost:3000/ws` |
 | **Android Emulator** | `http://10.0.2.2:3000` | `ws://10.0.2.2:3000/ws` |
-| **Physical Device (LAN)** | `http://<YOUR_LAN_IP>:3000` | `ws://<YOUR_LAN_IP>:3000/ws` |
+| **Physical Android Device (LAN)** | `http://<YOUR_LAN_IP>:3000` | `ws://<YOUR_LAN_IP>:3000/ws` |
 
-> **Testing on Physical Phones via Wi-Fi**:  
-> If running on a physical Android or iOS device, find your computer's local Wi-Fi IP address (e.g. `192.168.1.50`) and set:
+> **Testing on Physical Android Device via Wi-Fi**:  
+> When testing on a physical Android device, find your computer's local Wi-Fi IP address (e.g. `192.168.1.50`) and set:
 > ```dart
 > // lib/core/constants/api_constants.dart
 > static const String? overrideBaseUrl = 'http://192.168.1.50:3000';
@@ -104,11 +103,12 @@ The app automatically detects the host environment:
 
 ---
 
-## 🚀 Getting Started & Running
+## Getting Started & Running
 
 ### 1. Prerequisites
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) (v3.24+ recommended)
 - [Dart SDK](https://dart.dev/) (v3.5+ included with Flutter)
+- Android Studio with Android SDK & Android Virtual Device (AVD) configured
 - A running instance of the backend service (see `collab_food_order_backend/README.md`)
 
 ### 2. Install Dependencies
@@ -122,36 +122,18 @@ flutter analyze
 ```
 
 ### 4. Run the Application
-- **On Chrome (Web)**:
-  ```bash
-  flutter run -d chrome
-  ```
 - **On Android Emulator**:
   ```bash
   flutter run -d emulator-5554
   ```
-- **On Connected Device**:
+- **On Connected Android Device**:
   ```bash
   flutter run
   ```
-
+  
 ---
 
-## 👥 Multi-User Testing Guide
-
-To test real-time collaboration between multiple users:
-1. **Option A: Two Chrome Windows / Tabs**
-   - Open two browser tabs on the Flutter web app (e.g. `http://localhost:port`).
-   - In Window 1: Tap **"Start Group Order"**, enter `"Alice"`, and note the 6-character Join Code.
-   - In Window 2: Tap **"Join Group Order"**, enter the code and `"Bob"`.
-   - Add items to the shared cart and watch quantities, line totals, and user attribution sync instantly!
-2. **Option B: Android Emulator + Chrome Window**
-   - Launch one client on the Android Emulator and one client on Chrome.
-   - Both connect to the local Node.js backend seamlessly.
-
----
-
-## 🧪 Automated Tests
+## Automated Tests
 
 Run the full Flutter test suite:
 ```bash
@@ -177,7 +159,7 @@ flutter test
 
 ---
 
-## 📦 Building Applications
+## Building Applications
 
 - **Build Debug APK**:
   ```bash
@@ -190,9 +172,3 @@ flutter test
   flutter build apk --release
   ```
   Output: `build/app/outputs/flutter-apk/app-release.apk`
-
-- **Build Web Bundle**:
-  ```bash
-  flutter build web
-  ```
-  Output: `build/web/`
