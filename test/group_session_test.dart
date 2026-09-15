@@ -62,5 +62,20 @@ void main() {
       expect(state.isCurrentParticipantReady, true);
       expect(state.readyParticipantCount, 1);
     });
+
+    test('GroupSessionInfo parses CLOSED status correctly', () {
+      final json = {
+        'id': 'sess-closed',
+        'code': 'BURGER',
+        'status': 'CLOSED',
+        'version': 5,
+        'hostParticipantId': 'user-host',
+        'allReady': false,
+        'totalCartAmount': 0,
+      };
+
+      final info = GroupSessionInfo.fromJson(json);
+      expect(info.status, 'CLOSED');
+    });
   });
 }

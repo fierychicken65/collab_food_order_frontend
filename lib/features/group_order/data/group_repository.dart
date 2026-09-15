@@ -26,4 +26,12 @@ class GroupRepository {
     final response = await _apiClient.get('${ApiConstants.groups}/$sessionId');
     return response as Map<String, dynamic>;
   }
+
+  Future<Map<String, dynamic>> leaveGroupSession(String sessionId, String participantId) async {
+    final response = await _apiClient.post(
+      '${ApiConstants.groups}/$sessionId/leave',
+      body: {'participantId': participantId},
+    );
+    return response as Map<String, dynamic>;
+  }
 }

@@ -23,6 +23,7 @@ class GroupSessionScreen extends ConsumerStatefulWidget {
 class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
   StreamSubscription<String>? _errorSubscription;
   StreamSubscription<GroupOrderSummary>? _orderPlacedSubscription;
+  StreamSubscription<String>? _sessionClosedSubscription;
   String _selectedCategory = 'All';
 
   @override
@@ -67,6 +68,35 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
           ),
         );
       });
+
+      // Listen to SESSION_CLOSED broadcast events
+      _sessionClosedSubscription = ref
+          .read(groupSessionProvider.notifier)
+          .sessionClosedStream
+          .listen((reason) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Group Session Closed'),
+            content: Text(reason),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Return to Home'),
+              ),
+            ],
+          ),
+        );
+      });
     });
   }
 
@@ -74,6 +104,7 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
   void dispose() {
     _errorSubscription?.cancel();
     _orderPlacedSubscription?.cancel();
+    _sessionClosedSubscription?.cancel();
     super.dispose();
   }
 
@@ -89,12 +120,15 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
   }
 
   void _confirmLeaveSession() {
+    final isHost = ref.read(groupSessionProvider)?.isCurrentParticipantHost ?? false;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Leave Group Session?'),
-        content: const Text(
-          'Are you sure you want to disconnect from this shared session?',
+        title: Text(isHost ? 'Close Group Session?' : 'Leave Group Session?'),
+        content: Text(
+          isHost
+              ? 'As the host, leaving will close this group session for all participants and release unpurchased cart items.'
+              : 'Are you sure you want to disconnect from this shared session?',
         ),
         actions: [
           TextButton(
@@ -105,9 +139,12 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
             onPressed: () {
               ref.read(groupSessionProvider.notifier).leaveSession();
               Navigator.of(ctx).pop(); // dismiss dialog
-              Navigator.of(context).pop(); // back to home
+              Navigator.of(context).popUntil((route) => route.isFirst); // back to home
             },
-            child: const Text('Leave', style: TextStyle(color: Colors.red)),
+            child: Text(
+              isHost ? 'Close Session' : 'Leave',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

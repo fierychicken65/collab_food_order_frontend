@@ -21,11 +21,13 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   StreamSubscription? _wsSubscription;
   final StreamController<String> _errorController = StreamController<String>.broadcast();
   final StreamController<GroupOrderSummary> _orderPlacedController = StreamController<GroupOrderSummary>.broadcast();
+  final StreamController<String> _sessionClosedController = StreamController<String>.broadcast();
 
   GroupSessionNotifier(this._ref) : super(null);
 
   Stream<String> get errorStream => _errorController.stream;
   Stream<GroupOrderSummary> get orderPlacedStream => _orderPlacedController.stream;
+  Stream<String> get sessionClosedStream => _sessionClosedController.stream;
   WsClient get _wsClient => _ref.read(wsClientProvider);
 
   void initSession({
@@ -177,6 +179,13 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
         }
         break;
 
+      case 'SESSION_CLOSED':
+        final reason = data?['reason'] as String? ??
+            'Host left the session. The group session is now closed.';
+        _sessionClosedController.add(reason);
+        leaveSession();
+        break;
+
       default:
         break;
     }
@@ -233,6 +242,19 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   }
 
   void leaveSession() {
+    if (state != null) {
+      final sessionId = state!.session.id;
+      final participantId = state!.currentParticipant.id;
+      _wsClient.send({
+        'type': 'LEAVE_SESSION',
+        'sessionId': sessionId,
+        'participantId': participantId,
+      });
+      _ref
+          .read(groupRepositoryProvider)
+          .leaveGroupSession(sessionId, participantId)
+          .catchError((_) => <String, dynamic>{});
+    }
     _wsSubscription?.cancel();
     _wsSubscription = null;
     _wsClient.disconnect();
@@ -252,6 +274,7 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
     _wsSubscription?.cancel();
     _errorController.close();
     _orderPlacedController.close();
+    _sessionClosedController.close();
     super.dispose();
   }
 }
