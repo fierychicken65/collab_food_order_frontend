@@ -12,8 +12,8 @@ void main() {
 
     // Verify that the title and ordering options render
     expect(find.text('Collab Food'), findsOneWidget);
-    expect(find.text('Normal (Solo) Order'), findsOneWidget);
+    expect(find.text('Solo Order'), findsOneWidget);
     expect(find.text('Start Group Order'), findsOneWidget);
-    expect(find.text('Join Group Session'), findsOneWidget);
+    expect(find.text('Join Session'), findsOneWidget);
   });
 }

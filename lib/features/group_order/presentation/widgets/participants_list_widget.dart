@@ -14,11 +14,14 @@ class ParticipantsListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,36 +34,58 @@ class ParticipantsListWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'Participants (${participants.length})',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 const Spacer(),
                 Text(
                   '${participants.where((p) => p.isOnline).length} online',
-                  style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? const Color(0xFF86EFAC) : Colors.green.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: theme.dividerColor),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: participants.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+            separatorBuilder: (context, index) => Divider(height: 1, indent: 56, color: theme.dividerColor),
             itemBuilder: (context, index) {
               final p = participants[index];
               final isMe = p.id == currentParticipantId;
+
+              final isReadyBg = p.isReady
+                  ? (isDark ? const Color(0xFF143823) : Colors.green.shade50)
+                  : (isDark ? const Color(0xFF3E2723) : Colors.orange.shade50);
+              final isReadyBorder = p.isReady
+                  ? (isDark ? const Color(0xFF1B5E20) : Colors.green.shade200)
+                  : (isDark ? const Color(0xFF4E2600) : Colors.orange.shade200);
+              final isReadyText = p.isReady
+                  ? (isDark ? const Color(0xFF86EFAC) : Colors.green.shade900)
+                  : (isDark ? const Color(0xFFFDBA74) : Colors.orange.shade900);
 
               return ListTile(
                 dense: true,
                 leading: Stack(
                   children: [
                     CircleAvatar(
-                      backgroundColor: p.isHost ? Colors.orange.shade100 : Colors.blue.shade100,
+                      backgroundColor: p.isHost
+                          ? (isDark ? const Color(0xFF4E2600) : Colors.orange.shade100)
+                          : (isDark ? const Color(0xFF0D47A1).withValues(alpha: 0.4) : Colors.blue.shade100),
                       child: Text(
                         p.displayName.isNotEmpty ? p.displayName[0].toUpperCase() : '?',
                         style: TextStyle(
-                          color: p.isHost ? Colors.orange.shade900 : Colors.blue.shade900,
+                          color: p.isHost
+                              ? (isDark ? const Color(0xFFFFB74D) : Colors.orange.shade900)
+                              : (isDark ? const Color(0xFF90CAF9) : Colors.blue.shade900),
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -73,9 +98,9 @@ class ParticipantsListWidget extends StatelessWidget {
                         width: 11,
                         height: 11,
                         decoration: BoxDecoration(
-                          color: p.isOnline ? Colors.green : Colors.grey.shade400,
+                          color: p.isOnline ? Colors.green : (isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: theme.cardColor, width: 2),
                         ),
                       ),
                     ),
@@ -88,6 +113,7 @@ class ParticipantsListWidget extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: isMe ? FontWeight.bold : FontWeight.w600,
                         fontSize: 14,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     if (isMe)
@@ -100,12 +126,16 @@ class ParticipantsListWidget extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.amber.shade100,
+                          color: isDark ? const Color(0xFF4E2600) : Colors.amber.shade100,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           '👑 HOST',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.amber.shade900),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? const Color(0xFFFFB74D) : Colors.amber.shade900,
+                          ),
                         ),
                       ),
                     ],
@@ -114,11 +144,9 @@ class ParticipantsListWidget extends StatelessWidget {
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: p.isReady ? Colors.green.shade50 : Colors.orange.shade50,
+                    color: isReadyBg,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: p.isReady ? Colors.green.shade200 : Colors.orange.shade200,
-                    ),
+                    border: Border.all(color: isReadyBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -126,7 +154,7 @@ class ParticipantsListWidget extends StatelessWidget {
                       Icon(
                         p.isReady ? Icons.check_circle_rounded : Icons.hourglass_top_rounded,
                         size: 13,
-                        color: p.isReady ? Colors.green.shade800 : Colors.orange.shade800,
+                        color: isReadyText,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -134,7 +162,7 @@ class ParticipantsListWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: p.isReady ? Colors.green.shade900 : Colors.orange.shade900,
+                          color: isReadyText,
                         ),
                       ),
                     ],

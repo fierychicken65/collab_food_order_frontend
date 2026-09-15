@@ -95,20 +95,19 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Thank you, ${order?['customerName'] ?? 'Customer'}!\nYour solo order has been received.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 14, color: Theme.of(ctx).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: Theme.of(ctx).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -117,10 +116,10 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
                   const Text('Total Paid:', style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(
                     '\$${(((order?['totalAmount'] as int? ?? 0)) / 100).toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: AppColors.primary,
+                      color: Theme.of(ctx).colorScheme.primary,
                     ),
                   ),
                 ],
@@ -152,9 +151,9 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
         right: 20,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).canvasColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Form(
         key: _formKey,
@@ -203,7 +202,7 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
                               ),
                               Text(
                                 '${item.formattedLineTotal} (${item.product.formattedPrice} each)',
-                                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
                               ),
                             ],
                           ),
@@ -275,10 +274,10 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
                     const Text('Total Amount:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     Text(
                       cart.formattedTotalAmount,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],

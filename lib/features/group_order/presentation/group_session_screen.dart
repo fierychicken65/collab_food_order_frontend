@@ -312,9 +312,9 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
               ),
             ],
             bottom: TabBar(
-              indicatorColor: AppColors.primary,
-              labelColor: AppColors.primary,
-              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
               tabs: [
                 const Tab(
                   icon: Icon(Icons.restaurant_menu_rounded),
@@ -324,7 +324,7 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
                   icon: Badge(
                     label: Text('${groupState.totalCartItemCount}'),
                     isLabelVisible: groupState.totalCartItemCount > 0,
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     child: const Icon(Icons.shopping_cart_outlined),
                   ),
                   text: 'Group Cart',
@@ -332,10 +332,11 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
                 Tab(
                   icon: Badge(
                     label: Text('${groupState.participants.length}'),
-                    backgroundColor: AppColors.secondary,
+                    isLabelVisible: groupState.participants.isNotEmpty,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     child: const Icon(Icons.people_outline_rounded),
                   ),
-                  text: 'Members',
+                  text: 'Participants',
                 ),
               ],
             ),
@@ -446,19 +447,19 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
                           labelStyle: TextStyle(
                             color: isSelected
                                 ? Colors.white
-                                : AppColors.textPrimary,
+                                : Theme.of(context).colorScheme.onSurface,
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                             fontSize: 13,
                           ),
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).cardColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
                               color: isSelected
                                   ? AppColors.primary
-                                  : Colors.grey.shade300,
+                                  : Theme.of(context).dividerColor,
                             ),
                           ),
                         );
@@ -619,17 +620,16 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color:
-                                  AppColors.primaryLight.withValues(alpha: 0.3),
+                              color: AppColors.primary.withValues(alpha: 0.15),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(

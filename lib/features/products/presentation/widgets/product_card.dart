@@ -18,39 +18,41 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isOut = product.isOutOfStock;
     final isMaxInCart = cartQuantity >= product.availableStock;
 
     return Card(
       key: ValueKey('product_${product.id}'),
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image with fallback
+            // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: SizedBox(
-                width: 100,
-                height: 100,
+                width: 96,
+                height: 96,
                 child: Image.network(
                   product.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey.shade200,
-                    child: const Icon(
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                    child: Icon(
                       Icons.fastfood_outlined,
-                      color: Colors.grey,
-                      size: 40,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      size: 36,
                     ),
                   ),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: Colors.grey.shade100,
+                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                       child: const Center(
                         child: SizedBox(
                           width: 24,
@@ -76,9 +78,9 @@ class ProductCard extends StatelessWidget {
                       Text(
                         product.category.toUpperCase(),
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade600,
+                          color: theme.colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -91,22 +93,22 @@ class ProductCard extends StatelessWidget {
                   // Name
                   Text(
                     product.name,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: theme.colorScheme.onSurface,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
 
                   // Description
                   Text(
                     product.description,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: theme.colorScheme.onSurfaceVariant,
                       height: 1.25,
                     ),
                     maxLines: 2,
@@ -121,7 +123,7 @@ class ProductCard extends StatelessWidget {
                       Text(
                         product.formattedPrice,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
@@ -130,16 +132,16 @@ class ProductCard extends StatelessWidget {
                       // Actions
                       if (isOut)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Unavailable',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                              fontSize: 11,
+                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -148,8 +150,8 @@ class ProductCard extends StatelessWidget {
                         ElevatedButton(
                           onPressed: onAdd,
                           style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(80, 34),
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            minimumSize: const Size(76, 32),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -157,42 +159,43 @@ class ProductCard extends StatelessWidget {
                           ),
                           child: const Text(
                             'Add +',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         )
                       else
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(color: theme.dividerColor),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
                                 visualDensity: VisualDensity.compact,
-                                iconSize: 18,
+                                iconSize: 16,
                                 padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                                 icon: const Icon(Icons.remove),
                                 onPressed: onDecrement,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
                                 child: Text(
                                   '$cartQuantity',
-                                  style: const TextStyle(
-                                    fontSize: 14,
+                                  style: TextStyle(
+                                    fontSize: 13,
                                     fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                               ),
                               IconButton(
                                 visualDensity: VisualDensity.compact,
-                                iconSize: 18,
+                                iconSize: 16,
                                 padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                                 icon: const Icon(Icons.add),
                                 onPressed: isMaxInCart ? null : onAdd,
                               ),
@@ -218,18 +221,19 @@ class _StockBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color bg;
     Color fg;
 
     if (product.isOutOfStock) {
-      bg = Colors.red.shade100;
-      fg = Colors.red.shade900;
+      bg = isDark ? const Color(0xFF451A1A) : Colors.red.shade100;
+      fg = isDark ? const Color(0xFFFCA5A5) : Colors.red.shade900;
     } else if (product.isLowStock) {
-      bg = Colors.orange.shade100;
-      fg = Colors.orange.shade900;
+      bg = isDark ? const Color(0xFF452B1A) : Colors.orange.shade100;
+      fg = isDark ? const Color(0xFFFDBA74) : Colors.orange.shade900;
     } else {
-      bg = Colors.green.shade100;
-      fg = Colors.green.shade900;
+      bg = isDark ? const Color(0xFF1A3B2B) : Colors.green.shade100;
+      fg = isDark ? const Color(0xFF86EFAC) : Colors.green.shade900;
     }
 
     return Container(

@@ -21,6 +21,8 @@ class CollabFoodApp extends StatelessWidget {
       title: 'Collab Food Order',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const HomeScreen(),
     );
   }

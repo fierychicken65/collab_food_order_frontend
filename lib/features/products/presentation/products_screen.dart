@@ -93,7 +93,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     final isSelected = cat == _selectedCategory;
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: FilterChip(
+                      child: ChoiceChip(
                         label: Text(cat),
                         selected: isSelected,
                         onSelected: (_) {
@@ -101,11 +101,15 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                             _selectedCategory = cat;
                           });
                         },
-                        selectedColor: AppColors.primaryLight,
-                        checkmarkColor: AppColors.primaryDark,
+                        selectedColor: AppColors.primary,
                         labelStyle: TextStyle(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                          color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                          fontSize: 13,
+                        ),
+                        backgroundColor: Theme.of(context).cardColor,
+                        side: BorderSide(
+                          color: isSelected ? AppColors.primary : Theme.of(context).dividerColor,
                         ),
                       ),
                     );
@@ -144,10 +148,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
+                border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -3),
                   ),
@@ -162,7 +167,10 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                       children: [
                         Text(
                           '${cart.totalItemCount} items in cart',
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                         Text(
                           cart.formattedTotalAmount,
@@ -177,7 +185,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     const Spacer(),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(150, 44),
+                        minimumSize: const Size(140, 44),
                       ),
                       onPressed: _openCartSheet,
                       icon: const Icon(Icons.shopping_cart_checkout, size: 18),

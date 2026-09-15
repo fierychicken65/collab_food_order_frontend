@@ -37,6 +37,22 @@ class CollaborativeCartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final readyBg = isReady
+        ? (isDark ? const Color(0xFF143823) : Colors.green.shade50)
+        : (isDark ? const Color(0xFF3E2723) : Colors.orange.shade50);
+    final readyBorder = isReady
+        ? (isDark ? const Color(0xFF1B5E20) : Colors.green.shade200)
+        : (isDark ? const Color(0xFF4E2600) : Colors.orange.shade200);
+    final readyText = isReady
+        ? (isDark ? const Color(0xFF86EFAC) : Colors.green.shade900)
+        : (isDark ? const Color(0xFFFDBA74) : Colors.orange.shade900);
+    final readySubtext = isReady
+        ? (isDark ? const Color(0xFF4ADE80) : Colors.green.shade700)
+        : (isDark ? const Color(0xFFFB923C) : Colors.orange.shade800);
+
     return Column(
       children: [
         // Personal Readiness Status Card
@@ -44,11 +60,9 @@ class CollaborativeCartWidget extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: isReady ? Colors.green.shade50 : Colors.orange.shade50,
+            color: readyBg,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isReady ? Colors.green.shade200 : Colors.orange.shade200,
-            ),
+            border: Border.all(color: readyBorder),
           ),
           child: Row(
             children: [
@@ -56,7 +70,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                 isReady
                     ? Icons.check_circle_rounded
                     : Icons.radio_button_unchecked_rounded,
-                color: isReady ? Colors.green.shade700 : Colors.orange.shade800,
+                color: readySubtext,
                 size: 24,
               ),
               const SizedBox(width: 10),
@@ -71,9 +85,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: isReady
-                            ? Colors.green.shade900
-                            : Colors.orange.shade900,
+                        color: readyText,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -83,9 +95,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                           : 'Mark yourself ready when done picking food',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isReady
-                            ? Colors.green.shade700
-                            : Colors.orange.shade800,
+                        color: readySubtext,
                       ),
                     ),
                   ],
@@ -97,14 +107,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  foregroundColor: isReady
-                      ? Colors.green.shade900
-                      : Colors.orange.shade900,
-                  side: BorderSide(
-                    color: isReady
-                        ? Colors.green.shade400
-                        : Colors.orange.shade400,
-                  ),
+                  foregroundColor: readyText,
+                  side: BorderSide(color: readyBorder),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -134,22 +138,22 @@ class CollaborativeCartWidget extends StatelessWidget {
                           width: 72,
                           height: 72,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.shopping_basket_outlined,
                             size: 36,
-                            color: Colors.grey.shade400,
+                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade400,
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           'Group Cart is Empty',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -158,7 +162,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: theme.colorScheme.onSurfaceVariant,
                             height: 1.35,
                           ),
                         ),
@@ -179,21 +183,14 @@ class CollaborativeCartWidget extends StatelessWidget {
                       key: ValueKey('cart_item_${item.id}'),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isMe
-                              ? AppColors.primary.withValues(alpha: 0.3)
-                              : Colors.grey.shade200,
+                              ? AppColors.primary
+                              : theme.dividerColor,
                           width: isMe ? 1.5 : 1.0,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -211,18 +208,18 @@ class CollaborativeCartWidget extends StatelessWidget {
                                       errorBuilder:
                                           (context, error, stackTrace) =>
                                               Container(
-                                        color: Colors.grey.shade200,
-                                        child: const Icon(
+                                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                                        child: Icon(
                                           Icons.fastfood_outlined,
-                                          color: Colors.grey,
+                                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                                         ),
                                       ),
                                     )
                                   : Container(
-                                      color: Colors.grey.shade200,
-                                      child: const Icon(
+                                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                                      child: Icon(
                                         Icons.fastfood_outlined,
-                                        color: Colors.grey,
+                                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                                       ),
                                     ),
                             ),
@@ -236,10 +233,10 @@ class CollaborativeCartWidget extends StatelessWidget {
                               children: [
                                 Text(
                                   item.productName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -251,7 +248,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                                   '${item.formattedPrice} each',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -264,9 +261,12 @@ class CollaborativeCartWidget extends StatelessWidget {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isMe
-                                        ? AppColors.primaryLight
-                                            .withValues(alpha: 0.35)
-                                        : Colors.grey.shade100,
+                                        ? (isDark
+                                            ? const Color(0xFF4E2600)
+                                            : AppColors.primaryLight.withValues(alpha: 0.35))
+                                        : (isDark
+                                            ? const Color(0xFF334155)
+                                            : const Color(0xFFF1F5F9)),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Row(
@@ -278,8 +278,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                                             : Icons.person_outline_rounded,
                                         size: 13,
                                         color: isMe
-                                            ? AppColors.primaryDark
-                                            : AppColors.textSecondary,
+                                            ? (isDark ? const Color(0xFFFFB74D) : AppColors.primaryDark)
+                                            : theme.colorScheme.onSurfaceVariant,
                                       ),
                                       const SizedBox(width: 4),
                                       Flexible(
@@ -293,8 +293,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                                                 ? FontWeight.w700
                                                 : FontWeight.w500,
                                             color: isMe
-                                                ? AppColors.primaryDark
-                                                : AppColors.textSecondary,
+                                                ? (isDark ? const Color(0xFFFFB74D) : AppColors.primaryDark)
+                                                : theme.colorScheme.onSurfaceVariant,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -325,10 +325,9 @@ class CollaborativeCartWidget extends StatelessWidget {
                               // Quantity controls
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(8),
-                                  border:
-                                      Border.all(color: Colors.grey.shade300),
+                                  border: Border.all(color: theme.dividerColor),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -347,7 +346,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                                             : Icons.remove,
                                         color: item.quantity <= 1
                                             ? Colors.red.shade600
-                                            : AppColors.textPrimary,
+                                            : theme.colorScheme.onSurface,
                                       ),
                                       onPressed: () {
                                         if (item.quantity <= 1) {
@@ -366,9 +365,10 @@ class CollaborativeCartWidget extends StatelessWidget {
                                       ),
                                       child: Text(
                                         '${item.quantity}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
+                                          color: theme.colorScheme.onSurface,
                                         ),
                                       ),
                                     ),
@@ -402,10 +402,11 @@ class CollaborativeCartWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
+            border: Border(top: BorderSide(color: theme.dividerColor)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, -3),
               ),
@@ -425,21 +426,21 @@ class CollaborativeCartWidget extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Total Cart Amount',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           formattedTotal,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -450,9 +451,9 @@ class CollaborativeCartWidget extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade50,
+                        color: isDark ? const Color(0xFF143823) : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green.shade200),
+                        border: Border.all(color: isDark ? const Color(0xFF1B5E20) : Colors.green.shade200),
                       ),
                       child: Row(
                         children: [
@@ -470,7 +471,7 @@ class CollaborativeCartWidget extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green.shade700,
+                              color: isDark ? const Color(0xFF86EFAC) : Colors.green.shade700,
                             ),
                           ),
                         ],
@@ -511,8 +512,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: (!allReady || cartItems.isEmpty)
-                            ? Colors.orange.shade800
-                            : Colors.green.shade700,
+                            ? (isDark ? const Color(0xFFFDBA74) : Colors.orange.shade800)
+                            : (isDark ? const Color(0xFF86EFAC) : Colors.green.shade700),
                       ),
                     ),
                   ),
@@ -524,13 +525,13 @@ class CollaborativeCartWidget extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: allReady
-                          ? Colors.green.shade50
-                          : Colors.grey.shade100,
+                          ? (isDark ? const Color(0xFF143823) : Colors.green.shade50)
+                          : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: allReady
-                            ? Colors.green.shade300
-                            : Colors.grey.shade300,
+                            ? (isDark ? const Color(0xFF1B5E20) : Colors.green.shade300)
+                            : theme.dividerColor,
                       ),
                     ),
                     child: Row(
@@ -541,8 +542,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                               : Icons.group_outlined,
                           size: 18,
                           color: allReady
-                              ? Colors.green.shade800
-                              : AppColors.textSecondary,
+                              ? (isDark ? const Color(0xFF86EFAC) : Colors.green.shade800)
+                              : theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -554,8 +555,8 @@ class CollaborativeCartWidget extends StatelessWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: allReady
-                                  ? Colors.green.shade900
-                                  : AppColors.textSecondary,
+                                  ? (isDark ? const Color(0xFF86EFAC) : Colors.green.shade900)
+                                  : theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
