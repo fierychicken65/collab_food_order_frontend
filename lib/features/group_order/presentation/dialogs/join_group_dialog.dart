@@ -6,6 +6,8 @@ import '../../models/group_session.dart';
 import '../../providers/group_session_provider.dart';
 import '../group_session_screen.dart';
 
+import '../../../user/providers/user_provider.dart';
+
 class JoinGroupDialog extends ConsumerStatefulWidget {
   const JoinGroupDialog({super.key});
 
@@ -15,10 +17,17 @@ class JoinGroupDialog extends ConsumerStatefulWidget {
 
 class _JoinGroupDialogState extends ConsumerState<JoinGroupDialog> {
   final _codeController = TextEditingController();
-  final _nameController = TextEditingController();
+  late final TextEditingController _nameController;
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    final savedName = ref.read(userProvider).name;
+    _nameController = TextEditingController(text: savedName);
+  }
 
   @override
   void dispose() {
@@ -30,6 +39,9 @@ class _JoinGroupDialogState extends ConsumerState<JoinGroupDialog> {
   Future<void> _handleJoin() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final name = _nameController.text.trim();
+    ref.read(userProvider.notifier).updateName(name);
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -39,7 +51,7 @@ class _JoinGroupDialogState extends ConsumerState<JoinGroupDialog> {
       final repo = ref.read(groupRepositoryProvider);
       final response = await repo.joinGroup(
         _codeController.text.trim().toUpperCase(),
-        _nameController.text.trim(),
+        name,
       );
 
       final sessionData = response['session'] as Map<String, dynamic>;

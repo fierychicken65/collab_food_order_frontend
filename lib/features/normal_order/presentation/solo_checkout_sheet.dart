@@ -6,6 +6,9 @@ import '../../../core/network/api_client.dart';
 import '../../products/providers/products_provider.dart';
 import '../providers/solo_cart_provider.dart';
 
+import '../../orders/providers/orders_provider.dart';
+import '../../user/providers/user_provider.dart';
+
 class SoloCheckoutSheet extends ConsumerStatefulWidget {
   const SoloCheckoutSheet({super.key});
 
@@ -14,10 +17,19 @@ class SoloCheckoutSheet extends ConsumerStatefulWidget {
 }
 
 class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
-  final _nameController = TextEditingController(text: 'Customer');
+  late final TextEditingController _nameController;
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    final savedName = ref.read(userProvider).name;
+    _nameController = TextEditingController(
+      text: savedName.isNotEmpty ? savedName : 'Customer',
+    );
+  }
 
   @override
   void dispose() {
@@ -30,6 +42,9 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
 
     final cart = ref.read(soloCartProvider);
     if (cart.isEmpty) return;
+
+    final customerName = _nameController.text.trim();
+    ref.read(userProvider.notifier).updateName(customerName);
 
     setState(() {
       _isSubmitting = true;
@@ -48,10 +63,31 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
       final response = await client.post(
         ApiConstants.soloOrder,
         body: {
-          'customerName': _nameController.text.trim(),
+          'customerName': customerName,
           'items': itemsPayload,
         },
       );
+
+      final orderData = response['order'] as Map<String, dynamic>?;
+
+      // Record order into local orders history
+      final recordItems = cart.items.values
+          .map((item) => OrderRecordItem(
+                productName: item.product.name,
+                quantity: item.quantity,
+                unitPrice: item.product.price / 100.0,
+              ))
+          .toList();
+
+      ref.read(ordersProvider.notifier).addOrder(OrderRecord(
+            id: (orderData?['id'] as String?) ?? DateTime.now().millisecondsSinceEpoch.toString(),
+            timestamp: DateTime.now(),
+            type: OrderType.solo,
+            customerName: customerName,
+            items: recordItems,
+            totalAmount: (cart.totalAmountCents) / 100.0,
+            status: 'CONFIRMED',
+          ));
 
       // Clear cart
       ref.read(soloCartProvider.notifier).clear();
@@ -61,7 +97,6 @@ class _SoloCheckoutSheetState extends ConsumerState<SoloCheckoutSheet> {
       if (!mounted) return;
       Navigator.of(context).pop(); // dismiss sheet
 
-      final orderData = response['order'] as Map<String, dynamic>?;
       _showSuccessDialog(orderData);
     } catch (e) {
       setState(() {

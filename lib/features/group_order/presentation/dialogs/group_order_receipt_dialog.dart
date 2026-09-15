@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/group_session.dart';
+import '../../../orders/providers/orders_provider.dart';
 
-class GroupOrderReceiptDialog extends StatelessWidget {
+class GroupOrderReceiptDialog extends ConsumerWidget {
   final GroupOrderSummary order;
   final VoidCallback onReturnHome;
 
@@ -13,7 +14,38 @@ class GroupOrderReceiptDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Record group order into history
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final items = order.items
+          .map((item) => OrderRecordItem(
+                productName: item.productName,
+                quantity: item.quantity,
+                unitPrice: item.price / 100.0,
+                addedByName: item.addedByName,
+              ))
+          .toList();
+
+      final record = OrderRecord(
+        id: order.orderId,
+        timestamp: DateTime.now(),
+        type: OrderType.group,
+        customerName: order.hostDisplayName,
+        sessionCode: order.sessionCode,
+        items: items,
+        totalAmount: order.totalAmount / 100.0,
+        status: order.status,
+      );
+
+      try {
+        final existingOrders = ref.read(ordersProvider);
+        if (!existingOrders.any((o) => o.id == order.orderId)) {
+          ref.read(ordersProvider.notifier).addOrder(record);
+        }
+      } catch (_) {
+        // Ignore if ProviderScope is not present in standalone widget test context
+      }
+    });
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(

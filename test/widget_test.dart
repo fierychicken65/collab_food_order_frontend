@@ -9,6 +9,7 @@ void main() {
         child: CollabFoodApp(),
       ),
     );
+    await tester.pumpAndSettle();
 
     // Verify that the title and ordering options render
     expect(find.text('Collab Food'), findsOneWidget);

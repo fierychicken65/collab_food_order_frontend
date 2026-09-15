@@ -33,35 +33,41 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Product Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: SizedBox(
-                width: 96,
-                height: 96,
-                child: Image.network(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                    child: Icon(
-                      Icons.fastfood_outlined,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                      size: 36,
-                    ),
-                  ),
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                      child: const Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+            Hero(
+              tag: 'product-image-${product.id}',
+              child: Material(
+                color: Colors.transparent,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 96,
+                    height: 96,
+                    child: Image.network(
+                      product.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        child: Icon(
+                          Icons.fastfood_outlined,
+                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                          size: 36,
                         ),
                       ),
-                    );
-                  },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -5,6 +5,8 @@ import '../../models/group_session.dart';
 import '../../providers/group_session_provider.dart';
 import '../group_session_screen.dart';
 
+import '../../../user/providers/user_provider.dart';
+
 class CreateGroupDialog extends ConsumerStatefulWidget {
   const CreateGroupDialog({super.key});
 
@@ -13,10 +15,17 @@ class CreateGroupDialog extends ConsumerStatefulWidget {
 }
 
 class _CreateGroupDialogState extends ConsumerState<CreateGroupDialog> {
-  final _nameController = TextEditingController();
+  late final TextEditingController _nameController;
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    final savedName = ref.read(userProvider).name;
+    _nameController = TextEditingController(text: savedName);
+  }
 
   @override
   void dispose() {
@@ -27,6 +36,9 @@ class _CreateGroupDialogState extends ConsumerState<CreateGroupDialog> {
   Future<void> _handleCreate() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final name = _nameController.text.trim();
+    ref.read(userProvider.notifier).updateName(name);
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -34,7 +46,7 @@ class _CreateGroupDialogState extends ConsumerState<CreateGroupDialog> {
 
     try {
       final repo = ref.read(groupRepositoryProvider);
-      final response = await repo.createGroup(_nameController.text.trim());
+      final response = await repo.createGroup(name);
 
       final sessionData = response['session'] as Map<String, dynamic>;
       final participantData = response['participant'] as Map<String, dynamic>;

@@ -130,7 +130,7 @@ class ParticipantsListWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '👑 HOST',
+                          'HOST',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
