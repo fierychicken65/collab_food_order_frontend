@@ -38,6 +38,28 @@ class GroupSessionInfo {
           : null,
     );
   }
+
+  GroupSessionInfo copyWith({
+    String? id,
+    String? code,
+    String? status,
+    int? version,
+    String? hostParticipantId,
+    bool? allReady,
+    int? totalCartAmount,
+    DateTime? createdAt,
+  }) {
+    return GroupSessionInfo(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      status: status ?? this.status,
+      version: version ?? this.version,
+      hostParticipantId: hostParticipantId ?? this.hostParticipantId,
+      allReady: allReady ?? this.allReady,
+      totalCartAmount: totalCartAmount ?? this.totalCartAmount,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
 
 class GroupParticipant {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/websocket/ws_client.dart';
 import '../../products/models/product.dart';
+import '../../products/providers/products_provider.dart';
 import '../data/group_repository.dart';
 import '../models/group_session.dart';
 
@@ -18,9 +19,11 @@ final groupRepositoryProvider = Provider<GroupRepository>((ref) {
 class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   final Ref _ref;
   StreamSubscription? _wsSubscription;
+  final StreamController<String> _errorController = StreamController<String>.broadcast();
 
   GroupSessionNotifier(this._ref) : super(null);
 
+  Stream<String> get errorStream => _errorController.stream;
   WsClient get _wsClient => _ref.read(wsClientProvider);
 
   void initSession({
@@ -30,12 +33,16 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
     List<GroupCartItem> cartItems = const [],
     List<Product> products = const [],
   }) {
+    final defaultProducts = products.isNotEmpty
+        ? products
+        : (_ref.read(productsProvider).valueOrNull ?? const <Product>[]);
+
     state = GroupSessionState(
       session: session,
       currentParticipant: currentParticipant,
       participants: participants.isNotEmpty ? participants : [currentParticipant],
       cartItems: cartItems,
-      products: products,
+      products: defaultProducts,
     );
 
     // Connect WebSocket
@@ -102,24 +109,100 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
 
             state = state!.copyWith(
               participants: updatedParticipants,
-              session: GroupSessionInfo(
-                id: state!.session.id,
-                code: state!.session.code,
-                status: state!.session.status,
-                version: state!.session.version,
-                hostParticipantId: state!.session.hostParticipantId,
-                allReady: allReady,
-                totalCartAmount: state!.session.totalCartAmount,
-                createdAt: state!.session.createdAt,
-              ),
+              session: state!.session.copyWith(allReady: allReady),
             );
           }
         }
         break;
 
+      case 'CART_UPDATED':
+        if (data != null) {
+          final cartItemsJson = data['cartItems'] as List? ?? [];
+          final totalCartAmount = data['totalCartAmount'] as int? ?? 0;
+          final version = data['version'] as int? ?? state!.session.version;
+
+          final cartList = cartItemsJson
+              .map((c) => GroupCartItem.fromJson(c as Map<String, dynamic>))
+              .toList();
+
+          state = state!.copyWith(
+            cartItems: cartList,
+            session: state!.session.copyWith(
+              totalCartAmount: totalCartAmount,
+              version: version,
+            ),
+          );
+        }
+        break;
+
+      case 'INVENTORY_UPDATED':
+        if (data != null) {
+          final productId = data['productId'] as String?;
+          final availableStock = data['availableStock'] as int?;
+          final totalStock = data['totalStock'] as int?;
+          final isOutOfStock = data['isOutOfStock'] as bool?;
+          final isLowStock = data['isLowStock'] as bool?;
+
+          if (productId != null && availableStock != null) {
+            _ref.read(productsProvider.notifier).updateProductStock(productId, availableStock);
+
+            final updatedProducts = state!.products.map((p) {
+              if (p.id == productId) {
+                return p.copyWith(
+                  availableStock: availableStock,
+                  totalStock: totalStock ?? p.totalStock,
+                  isOutOfStock: isOutOfStock,
+                  isLowStock: isLowStock,
+                );
+              }
+              return p;
+            }).toList();
+
+            state = state!.copyWith(products: updatedProducts);
+          }
+        }
+        break;
+
+      case 'ERROR':
+        final msg = event['message'] as String? ?? 'An unexpected error occurred';
+        _errorController.add(msg);
+        break;
+
       default:
         break;
     }
+  }
+
+  void addToCart(String productId, [int quantity = 1]) {
+    if (state == null) return;
+    _wsClient.send({
+      'type': 'CART_ADD',
+      'sessionId': state!.session.id,
+      'participantId': state!.currentParticipant.id,
+      'productId': productId,
+      'quantity': quantity,
+    });
+  }
+
+  void updateQuantity(String cartItemId, int quantity) {
+    if (state == null) return;
+    _wsClient.send({
+      'type': 'CART_UPDATE',
+      'sessionId': state!.session.id,
+      'participantId': state!.currentParticipant.id,
+      'cartItemId': cartItemId,
+      'quantity': quantity,
+    });
+  }
+
+  void removeItem(String cartItemId) {
+    if (state == null) return;
+    _wsClient.send({
+      'type': 'CART_REMOVE',
+      'sessionId': state!.session.id,
+      'participantId': state!.currentParticipant.id,
+      'cartItemId': cartItemId,
+    });
   }
 
   void leaveSession() {
@@ -132,6 +215,7 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   @override
   void dispose() {
     _wsSubscription?.cancel();
+    _errorController.close();
     super.dispose();
   }
 }
