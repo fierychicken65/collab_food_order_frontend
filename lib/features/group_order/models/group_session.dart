@@ -198,3 +198,85 @@ class GroupSessionState {
     );
   }
 }
+
+class GroupOrderItemSummary {
+  final String id;
+  final String? productId;
+  final String productName;
+  final int price;
+  final int quantity;
+  final int lineTotal;
+  final String addedByName;
+
+  const GroupOrderItemSummary({
+    required this.id,
+    this.productId,
+    required this.productName,
+    required this.price,
+    required this.quantity,
+    required this.lineTotal,
+    required this.addedByName,
+  });
+
+  String get formattedPrice => '\$${(price / 100).toStringAsFixed(2)}';
+  String get formattedLineTotal => '\$${(lineTotal / 100).toStringAsFixed(2)}';
+
+  factory GroupOrderItemSummary.fromJson(Map<String, dynamic> json) {
+    final price = json['price'] as int? ?? 0;
+    final quantity = json['quantity'] as int? ?? 1;
+    final lineTotal = json['lineTotal'] as int? ?? (price * quantity);
+
+    return GroupOrderItemSummary(
+      id: json['id'] as String? ?? '',
+      productId: json['productId'] as String?,
+      productName: json['productName'] as String? ?? 'Item',
+      price: price,
+      quantity: quantity,
+      lineTotal: lineTotal,
+      addedByName: json['addedByName'] as String? ?? 'Someone',
+    );
+  }
+}
+
+class GroupOrderSummary {
+  final String orderId;
+  final String sessionId;
+  final String sessionCode;
+  final String hostDisplayName;
+  final int totalAmount;
+  final String status;
+  final DateTime createdAt;
+  final List<GroupOrderItemSummary> items;
+
+  const GroupOrderSummary({
+    required this.orderId,
+    required this.sessionId,
+    required this.sessionCode,
+    required this.hostDisplayName,
+    required this.totalAmount,
+    required this.status,
+    required this.createdAt,
+    required this.items,
+  });
+
+  String get formattedTotal => '\$${(totalAmount / 100).toStringAsFixed(2)}';
+
+  factory GroupOrderSummary.fromJson(Map<String, dynamic> json) {
+    final itemsList = (json['items'] as List? ?? [])
+        .map((i) => GroupOrderItemSummary.fromJson(i as Map<String, dynamic>))
+        .toList();
+
+    return GroupOrderSummary(
+      orderId: json['orderId'] as String? ?? json['id'] as String? ?? '',
+      sessionId: json['sessionId'] as String? ?? '',
+      sessionCode: json['sessionCode'] as String? ?? '',
+      hostDisplayName: json['hostDisplayName'] as String? ?? '',
+      totalAmount: json['totalAmount'] as int? ?? 0,
+      status: json['status'] as String? ?? 'CONFIRMED',
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      items: itemsList,
+    );
+  }
+}

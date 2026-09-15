@@ -9,6 +9,7 @@ import '../../products/presentation/widgets/product_card.dart';
 import '../../products/providers/products_provider.dart';
 import '../models/group_session.dart';
 import '../providers/group_session_provider.dart';
+import 'dialogs/group_order_receipt_dialog.dart';
 import 'widgets/collaborative_cart_widget.dart';
 import 'widgets/participants_list_widget.dart';
 
@@ -21,6 +22,7 @@ class GroupSessionScreen extends ConsumerStatefulWidget {
 
 class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
   StreamSubscription<String>? _errorSubscription;
+  StreamSubscription<GroupOrderSummary>? _orderPlacedSubscription;
   String _selectedCategory = 'All';
 
   @override
@@ -46,12 +48,32 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
           ),
         );
       });
+
+      // Listen to ORDER_PLACED broadcast events and display receipt dialog
+      _orderPlacedSubscription = ref
+          .read(groupSessionProvider.notifier)
+          .orderPlacedStream
+          .listen((orderSummary) {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => GroupOrderReceiptDialog(
+            order: orderSummary,
+            onReturnHome: () {
+              ref.read(groupSessionProvider.notifier).leaveSession();
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+        );
+      });
     });
   }
 
   @override
   void dispose() {
     _errorSubscription?.cancel();
+    _orderPlacedSubscription?.cancel();
     super.dispose();
   }
 
@@ -368,11 +390,22 @@ class _GroupSessionScreenState extends ConsumerState<GroupSessionScreen> {
                 ],
               ),
 
-              // TAB 2: Live Collaborative Cart with Attribution
+              // TAB 2: Live Collaborative Cart with Attribution & Host Checkout
               CollaborativeCartWidget(
                 cartItems: groupState.cartItems,
                 currentParticipantId: currentParticipant.id,
                 totalCartAmount: session.totalCartAmount,
+                isHost: groupState.isCurrentParticipantHost,
+                isReady: groupState.isCurrentParticipantReady,
+                allReady: session.allReady,
+                readyCount: groupState.readyParticipantCount,
+                totalParticipants: groupState.participants.length,
+                onToggleReady: () {
+                  ref.read(groupSessionProvider.notifier).toggleReady();
+                },
+                onPlaceOrder: () {
+                  ref.read(groupSessionProvider.notifier).placeGroupOrder();
+                },
                 onUpdateQuantity: (cartItemId, newQty) {
                   ref
                       .read(groupSessionProvider.notifier)

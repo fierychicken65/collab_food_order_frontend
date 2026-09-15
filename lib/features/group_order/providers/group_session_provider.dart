@@ -20,10 +20,12 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   final Ref _ref;
   StreamSubscription? _wsSubscription;
   final StreamController<String> _errorController = StreamController<String>.broadcast();
+  final StreamController<GroupOrderSummary> _orderPlacedController = StreamController<GroupOrderSummary>.broadcast();
 
   GroupSessionNotifier(this._ref) : super(null);
 
   Stream<String> get errorStream => _errorController.stream;
+  Stream<GroupOrderSummary> get orderPlacedStream => _orderPlacedController.stream;
   WsClient get _wsClient => _ref.read(wsClientProvider);
 
   void initSession({
@@ -168,9 +170,34 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
         _errorController.add(msg);
         break;
 
+      case 'ORDER_PLACED':
+        if (data != null) {
+          final summary = GroupOrderSummary.fromJson(data);
+          _orderPlacedController.add(summary);
+        }
+        break;
+
       default:
         break;
     }
+  }
+
+  void toggleReady() {
+    if (state == null) return;
+    _wsClient.send({
+      'type': 'TOGGLE_READY',
+      'sessionId': state!.session.id,
+      'participantId': state!.currentParticipant.id,
+    });
+  }
+
+  void placeGroupOrder() {
+    if (state == null) return;
+    _wsClient.send({
+      'type': 'PLACE_ORDER',
+      'sessionId': state!.session.id,
+      'participantId': state!.currentParticipant.id,
+    });
   }
 
   void addToCart(String productId, [int quantity = 1]) {
@@ -216,6 +243,7 @@ class GroupSessionNotifier extends StateNotifier<GroupSessionState?> {
   void dispose() {
     _wsSubscription?.cancel();
     _errorController.close();
+    _orderPlacedController.close();
     super.dispose();
   }
 }
